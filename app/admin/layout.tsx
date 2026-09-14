@@ -1,3 +1,11 @@
 'use client';
-import Link from 'next/link';import {usePathname} from 'next/navigation';
-export default function Layout({children}:{children:React.ReactNode}){const pathname=usePathname();if(pathname==='/admin/login')return <>{children}</>;return <div className="admin-shell" dir="rtl"><aside className="sidebar"><Link href="/admin" className="admin-brand">Sho<span>Tech</span><small>لوحة التحكم</small></Link><nav className="admin-nav"><Link href="/admin">الرئيسية</Link><Link href="/admin/sections">محتوى الموقع</Link><Link href="/admin/services">الخدمات</Link><Link href="/admin/projects">المشاريع</Link><Link href="/admin/messages">الرسائل</Link><Link href="/admin/settings">إعدادات الموقع</Link></nav><div className="admin-bottom"><Link href="/" target="_blank">فتح الموقع ↗</Link></div></aside><section className="admin-content"><header className="admin-topbar"><span>لوحة تحكم ShoTech</span><Link href="/" target="_blank">عرض الموقع ↗</Link></header><main className="adminmain">{children}</main></section></div>}
+import Link from 'next/link';
+import {usePathname} from 'next/navigation';
+import {LayoutDashboard,PanelsTopLeft,BriefcaseBusiness,FolderKanban,Inbox,Settings,ExternalLink} from 'lucide-react';
+import './admin.css';
+const nav=[['/admin','الرئيسية',LayoutDashboard],['/admin/sections','محتوى الموقع',PanelsTopLeft],['/admin/services','الخدمات',BriefcaseBusiness],['/admin/projects','المشاريع',FolderKanban],['/admin/messages','الرسائل',Inbox],['/admin/settings','الإعدادات',Settings]] as const;
+export default function Layout({children}:{children:React.ReactNode}){
+ const pathname=usePathname();
+ if(pathname==='/admin/login')return <>{children}</>;
+ return <div className="admin-shell" dir="rtl"><aside className="sidebar"><Link href="/admin" className="admin-brand">Sho<span>Tech</span><small>لوحة التحكم</small></Link><nav className="admin-nav">{nav.map(([href,label,Icon])=><Link key={href} href={href} className={pathname===href||pathname.startsWith(href+'/')?'active':''}><Icon size={17}/>{label}</Link>)}</nav><div className="admin-bottom"><Link href="/" target="_blank"><ExternalLink size={15}/> فتح الموقع</Link></div></aside><section className="admin-content"><header className="admin-topbar"><strong>لوحة تحكم ShoTech</strong><Link href="/" target="_blank" className="admin-top-link">عرض الموقع <ExternalLink size={15}/></Link></header><main className="adminmain">{children}</main></section></div>
+}
