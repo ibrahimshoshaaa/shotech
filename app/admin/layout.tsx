@@ -1,1 +1,5 @@
-import Link from 'next/link';export default function Layout({children}:{children:React.ReactNode}){return <div className="admin"><aside className="sidebar"><div className="brand">Sho<b>Tech</b></div><Link href="/admin">Overview</Link><Link href="/admin/projects">Projects</Link><Link href="/admin/services">Services</Link><Link href="/admin/messages">Messages</Link><Link href="/admin/settings">Settings</Link><a href="/">View Website</a></aside><main className="adminmain">{children}</main></div>}
+import Link from 'next/link';
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return <div className="admin-shell"><aside className="sidebar"><Link href="/admin" className="admin-brand">Sho<span>Tech</span><small>ADMIN PANEL</small></Link><nav className="admin-nav"><Link href="/admin">Overview</Link><Link href="/admin/projects">Projects</Link><Link href="/admin/services">Services</Link><Link href="/admin/messages">Messages</Link><Link href="/admin/settings">Settings</Link></nav><div className="admin-bottom"><Link href="/" target="_blank">View Website ↗</Link></div></aside><section className="admin-content"><header className="admin-topbar"><span>CONTROL CENTER</span><Link href="/">Website ↗</Link></header><main className="adminmain">{children}</main></section></div>;
+}
