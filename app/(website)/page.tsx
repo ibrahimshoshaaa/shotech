@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Check, Code2, Database, LayoutDashboard, Smartphone, Sparkles, Globe2 } from 'lucide-react';
+import { ArrowLeft, Check, Code2, Database, LayoutDashboard, Smartphone, Sparkles, Globe2, ShoppingCart, Building2, MonitorSmartphone, Workflow, Palette, ShieldCheck, Rocket, Settings, Layers3, ChartNoAxesCombined } from 'lucide-react';
 import { getProjects, getServices, getSettings } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
-const iconMap: Record<string, any> = { Code2, Database, LayoutDashboard, Smartphone, Sparkles, Globe2 };
+const iconMap: Record<string, any> = { Code2, Database, LayoutDashboard, Smartphone, Sparkles, Globe2, ShoppingCart, Building2, MonitorSmartphone, Workflow, Palette, ShieldCheck, Rocket, Settings, Layers3, ChartNoAxesCombined };
 
 const fallbackServices = [
   { id: '1', title: 'تطوير المواقع', description: 'مواقع سريعة، احترافية، ومتجاوبة مصممة حول هدف مشروعك.', icon: 'Globe2', slug: 'web-development' },
