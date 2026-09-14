@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:init": "tsx scripts/init-db.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.15.7",
@@ -24,6 +25,7 @@
     "@types/react-dom": "^19.0.3",
     "eslint": "^9.19.0",
     "eslint-config-next": "16.3.4",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "tsx": "^4.19.3"
   }
 }

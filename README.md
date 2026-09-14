@@ -1,47 +1,64 @@
 # ShoTech Solutions
 
-Production-oriented full-stack company website and custom CMS built with **Next.js 16 + React + TypeScript + Turso/libSQL + Cloudinary**.
+Full-stack company website + custom admin CMS built with **Next.js 16, React, TypeScript, Turso/libSQL and Cloudinary**.
 
-## Features
-- Public website: Home, Services, Projects, Project Details, About, Contact
-- Dynamic content — no hardcoded portfolio data required
-- Admin dashboard with protected routes
-- Project CRUD: title, slug, content, category, technologies, links, status, featured
-- Service CRUD
-- Contact inbox: read/delete
-- Dynamic company + SEO settings
-- Cloudinary image upload endpoint
-- Turso/libSQL schema included
-- Responsive dark ShoTech UI
+## Important: database initialization
+The application now automatically creates its required tables on the first database request using `CREATE TABLE IF NOT EXISTS`. This fixes the Vercel error:
 
-## Setup
+`SQLite error: no such table: services/projects`
+
+You can also initialize manually:
+
+```bash
+npm install
+npm run db:init
+```
+
+## Local development
+
 ```bash
 npm install
 cp .env.example .env.local
-```
-Fill `.env.local`.
-
-### Initialize database
-Run `scripts/schema.sql` in your Turso database. For local development the app uses `file:local.db` when `TURSO_DATABASE_URL` is absent; initialize that database with the same schema.
-
-```bash
+npm run db:init
 npm run dev
 ```
-Open `http://localhost:3000`.
-Admin login is `/admin/login`.
 
-## Production checklist
-1. Create Turso database and run schema.
-2. Create Cloudinary account and add credentials.
-3. Set a strong `JWT_SECRET`.
-4. Set `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD`.
-5. Add all variables to Vercel.
-6. Deploy to Vercel.
+If `TURSO_DATABASE_URL` is not set locally, the app uses `file:local.db` and creates the tables automatically.
 
-## Git
-```bash
-git init
-git add .
-git commit -m "Initial ShoTech Solutions release"
+## Vercel + Turso
+
+1. Create a Turso database.
+2. In Vercel → Project → Settings → Environment Variables add:
+
+```text
+TURSO_DATABASE_URL=libsql://...
+TURSO_AUTH_TOKEN=...
+JWT_SECRET=<long-random-secret>
+ADMIN_EMAIL=<your-email>
+ADMIN_PASSWORD=<strong-password>
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
 ```
-Then connect your GitHub repository and push.
+
+3. Redeploy.
+4. Open the site. The database tables are created automatically on the first request.
+
+> On Vercel, a missing `TURSO_DATABASE_URL` intentionally throws a clear configuration error instead of trying to create a local `local.db` file.
+
+## Features
+- Public pages: Home, Services, Projects, Project Details, About, Contact
+- Dynamic projects and services
+- Admin login and protected dashboard
+- Project CRUD
+- Service CRUD
+- Contact messages
+- Dynamic settings and SEO fields
+- Cloudinary upload endpoint
+- Turso/libSQL database
+
+## Build
+
+```bash
+npm run build
+```
