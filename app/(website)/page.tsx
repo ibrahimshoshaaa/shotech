@@ -42,7 +42,7 @@ export default async function Home() {
           <div className="hero-note"><span><i/> حلول مخصصة</span><span><i/> تصميم وتجربة مستخدم</span><span><i/> دعم وتطوير مستمر</span></div>
         </div>
         <div className="hero-art">
-          <div className="hero-orb"><div className="hero-logo"><Image src="/shotech-header.png" alt="ShoTech" width={270} height={180} priority/></div></div>
+          <div className="hero-orb"><div className="hero-logo"><Image src="/shotech-mark.png" alt="ShoTech" width={270} height={180} priority/></div></div>
           <div className="float-box float-one"><strong>نظامك تحت السيطرة</strong><small>من الفكرة إلى التشغيل</small></div>
           <div className="float-box float-two"><strong>Built for your business</strong><small>Simple · Scalable · Reliable</small></div>
         </div>
