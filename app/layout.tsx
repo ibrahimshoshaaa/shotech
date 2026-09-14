@@ -1,14 +1,15 @@
 import './globals.css';
-import type {Metadata} from 'next';
+import './website.css';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'ShoTech Solutions',
-  description: 'Smart Solutions. Powerful Systems.',
+  title: 'ShoTech Solutions | حلول رقمية تبني فرقًا',
+  description: 'ShoTech تبني مواقع وأنظمة وحلولًا رقمية عملية تساعد الشركات على النمو.',
 };
 
-export default function Root({children}: {children: React.ReactNode}) {
+export default function Root({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <body>{children}</body>
     </html>
   );
