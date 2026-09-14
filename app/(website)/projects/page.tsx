@@ -1,10 +1,6 @@
-import Link from "next/link";
-import { getProjects } from "@/lib/site";
-export const dynamic = "force-dynamic";
-export default async function Page(){
-  const p=await getProjects();
-  return <main className="container page"><div className="eyebrow">PORTFOLIO</div><h1>Our systems & products.</h1><div className="grid">{p.map((x:any)=>{
-    let images:string[]=[]; try{images=JSON.parse(x.images||"[]")}catch{}
-    const cover=x.cover_image||images[0];
-    return <article className="card project" key={x.id}>{cover?<img src={cover} alt={x.title}/>:<div className="cover"/>}<div className="pad"><div className="project-meta">{x.category||"PROJECT"}{images.length>1?` · ${images.length} photos`:""}</div><h2>{x.title}</h2><p className="muted">{x.excerpt}</p><Link className="btn small" href={`/projects/${x.slug}`}>Details</Link></div></article>;
-  })}</div>{!p.length&&<div className="empty">Projects added by the admin will appear here.</div>}</main>}
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowLeft, Sparkles } from 'lucide-react';
+import { getProjects } from '@/lib/site';
+export const dynamic='force-dynamic';
+export default async function Page(){const projects=await getProjects();return <main><section className="page-hero"><div className="container"><div className="eyebrow">OUR WORK</div><h1>أعمالنا بتحكي طريقتنا.</h1><p>مجموعة من الأنظمة والمنصات والتجارب الرقمية اللي بنيناها بهدف واضح: حل مشكلة حقيقية بشكل عملي.</p></div></section><section className="section"><div className="container"><div className="projects">{projects.map((x:any,i:number)=>{let images:string[]=[];try{images=JSON.parse(x.images||'[]')}catch{}const cover=x.cover_image||images[0];return <Link href={`/projects/${x.slug}`} className="project-card" key={x.id}><div className="project-media">{cover?<Image src={cover} alt={x.title} width={800} height={500}/>:<div className="project-placeholder"><Sparkles size={35}/></div>}</div><div className="project-body"><div className="project-meta">{x.category||'DIGITAL PROJECT'} · {String(i+1).padStart(2,'0')}</div><h3>{x.title}</h3><p>{x.excerpt}</p><span className="card-link">شوف المشروع <ArrowLeft size={15}/></span></div></Link>})}</div>{!projects.length&&<div className="empty">لسه بنضيف أعمالنا هنا.</div>}</div></section><section className="container section" style={{paddingTop:0}}><div className="cta"><div><div className="eyebrow">YOUR PROJECT</div><h2>عايز مشروعك يكون التالي؟</h2><p>خلينا نعرف أنت بتبني إيه وإحنا نرتب معاك البداية.</p></div><Link href="/contact" className="btn btn-primary">ابدأ محادثة <ArrowLeft size={17}/></Link></div></section></main>}
