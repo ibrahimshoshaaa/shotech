@@ -1,66 +1,19 @@
 'use client';
 import {useEffect,useState} from 'react';
-
-const blank={page:'home',type:'custom',title:'',subtitle:'',body:'',icon:'',image:'',button_text:'',button_url:'',data:'{}',sort_order:0,visible:true};
-const types=[
-  ['hero','الواجهة الرئيسية','أول جزء يظهر للزائر'],
-  ['services','الخدمات','عرض خدمات الشركة'],
-  ['about','من نحن','نبذة عن الشركة'],
-  ['why','لماذا نحن','مميزات ShoTech'],
-  ['process','طريقة العمل','خطوات تنفيذ المشروع'],
-  ['projects','المشاريع','عرض أعمال ومشاريع الشركة'],
-  ['cta','دعوة للتواصل','جزء يدعو العميل للتواصل'],
-  ['custom','قسم مخصص','قسم نصي عادي']
-];
+import {Eye,EyeOff,Trash2,Pencil,GripVertical} from 'lucide-react';
+import IconPicker from '@/components/admin/IconPicker';
+import {PageHeader,SectionCard,Field,SaveBar,StatusBadge} from '@/components/admin/AdminUI';
+const blank={page:'home',type:'custom',title:'',subtitle:'',body:'',icon:'Sparkles',image:'',button_text:'',button_url:'',data:'{}',sort_order:0,visible:true};
+const types=[['hero','الواجهة الرئيسية','Hero'],['services','الخدمات','Services'],['about','من نحن','About'],['why','لماذا نحن','Why'],['process','طريقة العمل','Process'],['projects','المشاريع','Projects'],['cta','دعوة للتواصل','CTA'],['custom','قسم مخصص','Custom']];
 const pages=[['home','الصفحة الرئيسية'],['about','من نحن'],['why','لماذا نحن'],['process','طريقة العمل']];
-
 export default function Page(){
- const [page,setPage]=useState('home'),[items,setItems]=useState<any[]>([]),[f,setF]=useState<any>(blank),[id,setId]=useState<number|null>(null),[error,setError]=useState(''),[saving,setSaving]=useState(false);
+ const [page,setPage]=useState('home'),[items,setItems]=useState<any[]>([]),[f,setF]=useState<any>({...blank}),[id,setId]=useState<number|null>(null),[error,setError]=useState(''),[saving,setSaving]=useState(false);
  const load=()=>fetch('/api/sections?page='+page).then(r=>r.json()).then(setItems);
  useEffect(()=>{load();setId(null);setF({...blank,page})},[page]);
  const set=(k:string,v:any)=>setF((x:any)=>({...x,[k]:v}));
  async function save(e:any){e.preventDefault();setError('');setSaving(true);try{const r=await fetch(id?'/api/sections/'+id:'/api/sections',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...f,page,data:f.data||'{}'})});const d=await r.json();if(!r.ok){setError(d.error||'تعذر الحفظ');return}setF({...blank,page});setId(null);await load()}finally{setSaving(false)}}
- async function del(i:number){if(!confirm('هل تريد حذف هذا القسم؟'))return;await fetch('/api/sections/'+i,{method:'DELETE'});load()}
- function edit(x:any){setId(x.id);setF({...x,visible:!!x.visible,data:x.data||'{}'}) ;window.scrollTo({top:0,behavior:'smooth'})}
- return <div dir="rtl">
-  <div className="eyebrow">إدارة محتوى الموقع</div>
-  <h1>{id?'تعديل القسم':'محتوى الموقع'}</h1>
-  <p className="muted">هنا تتحكم في الكلام والصور والأزرار والأقسام التي تظهر للزائر. لا تحتاج لتعديل أي كود.</p>
-
-  <div className="card" style={{marginBottom:18}}>
-   <label><strong>1. اختار الصفحة</strong><select value={page} onChange={e=>setPage(e.target.value)}>{pages.map(([v,l])=><option value={v} key={v}>{l}</option>)}</select></label>
-  </div>
-
-  <form className="form card" onSubmit={save}>
-   <div style={{marginBottom:12}}><strong>{id?'2. عدّل بيانات القسم':'2. أضف قسمًا جديدًا'}</strong><p className="muted" style={{margin:'5px 0 0'}}>اختار نوع القسم ثم اكتب المحتوى الذي تريد ظهوره على الموقع.</p></div>
-   <label>نوع القسم<select value={f.type} onChange={e=>set('type',e.target.value)}>{types.map(([v,l,h])=><option value={v} key={v}>{l} — {h}</option>)}</select></label>
-   <div className="grid">
-    <label>العنوان<input className="input" value={f.title} onChange={e=>set('title',e.target.value)} placeholder="مثال: حلول رقمية تناسب شركتك"/></label>
-    <label>العنوان الصغير<input className="input" value={f.subtitle} onChange={e=>set('subtitle',e.target.value)} placeholder="مثال: ماذا نقدم"/></label>
-   </div>
-   <label>الوصف<textarea value={f.body} onChange={e=>set('body',e.target.value)} placeholder="اكتب وصف القسم هنا..."/></label>
-   <div className="grid">
-    <label>الصورة <input className="input" value={f.image} onChange={e=>set('image',e.target.value)} placeholder="رابط الصورة (اختياري)"/></label>
-    <label>الأيقونة <input className="input" value={f.icon} onChange={e=>set('icon',e.target.value)} placeholder="مثال: Sparkles أو Code2"/></label>
-   </div>
-   <div className="grid">
-    <label>نص الزر <input className="input" value={f.button_text} onChange={e=>set('button_text',e.target.value)} placeholder="مثال: اعرف المزيد"/></label>
-    <label>رابط الزر <input className="input" value={f.button_url} onChange={e=>set('button_url',e.target.value)} placeholder="مثال: /contact"/></label>
-   </div>
-   <div className="grid">
-    <label>ترتيب القسم<input className="input" type="number" value={f.sort_order} onChange={e=>set('sort_order',+e.target.value)} /><small className="muted">الأرقام الأصغر تظهر أولًا: 10 ثم 20 ثم 30...</small></label>
-    <label style={{display:'flex',alignItems:'center',gap:10,paddingTop:28}}><input type="checkbox" checked={!!f.visible} onChange={e=>set('visible',e.target.checked)}/> إظهار القسم على الموقع</label>
-   </div>
-   {error&&<div className="error-box">{error}</div>}
-   <div style={{display:'flex',gap:10,flexWrap:'wrap'}}><button className="btn" disabled={saving}>{saving?'جاري الحفظ...':id?'حفظ التعديلات':'إضافة القسم'}</button>{id&&<button type="button" className="btn alt" onClick={()=>{setId(null);setF({...blank,page})}}>إلغاء</button>}</div>
-  </form>
-
-  <div style={{marginTop:28}}><div className="eyebrow">الأقسام الحالية</div><h2>ماذا يظهر في {pages.find(x=>x[0]===page)?.[1]}</h2><p className="muted">يمكنك تعديل أي قسم أو إخفاؤه أو حذفه.</p></div>
-  <div className="grid">{items.sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(x=><article className="card" key={x.id}>
-   <div className="eyebrow">{x.sort_order||0} · {types.find(t=>t[0]===x.type)?.[1]||x.type}</div>
-   <h3>{x.title||'قسم بدون عنوان'}</h3>
-   <p className="muted">{x.subtitle||x.body||'لا يوجد وصف'}</p>
-   <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}><span className="muted">{x.visible?'ظاهر على الموقع':'مخفي'}</span><button className="btn small alt" onClick={()=>edit(x)}>تعديل</button><button className="btn small danger" onClick={()=>del(x.id)}>حذف</button></div>
-  </article>)}</div>
- </div>
+ async function del(i:number){if(!confirm('حذف هذا القسم؟'))return;await fetch('/api/sections/'+i,{method:'DELETE'});load()}
+ function edit(x:any){setId(x.id);setF({...x,visible:!!x.visible,data:x.data||'{}'});window.scrollTo({top:0,behavior:'smooth'})}
+ function cancel(){setId(null);setF({...blank,page})}
+ return <><PageHeader eyebrow="محرر الموقع" title="محتوى الموقع" description="رتّب أقسام الموقع وعدّل النصوص والصور والأزرار والأيقونات من مكان واحد."/><SectionCard title="اختيار الصفحة" description="اختار الصفحة التي تريد إدارة أقسامها."><div className="admin-form-grid">{pages.map(([v,l])=><button type="button" key={v} className={`admin-page-tab ${page===v?'active':''}`} onClick={()=>setPage(v)}>{l}<span>{items.filter(x=>x.visible).length} قسم ظاهر</span></button>)}</div></SectionCard><form onSubmit={save}><SectionCard title={id?'تعديل القسم':'إضافة قسم جديد'} description={id?'عدّل المحتوى ثم احفظ التغييرات.':'أضف قسمًا جديدًا للصفحة المحددة.'}><div className="admin-grid"><Field label="نوع القسم" required><select value={f.type} onChange={e=>set('type',e.target.value)}>{types.map(([v,l,h])=><option value={v} key={v}>{l} — {h}</option>)}</select></Field><Field label="ترتيب القسم" hint="الأرقام الأصغر تظهر أولًا."><input type="number" value={f.sort_order} onChange={e=>set('sort_order',+e.target.value)}/></Field></div><div className="admin-grid"><Field label="العنوان"><input value={f.title} onChange={e=>set('title',e.target.value)} placeholder="عنوان القسم"/></Field><Field label="العنوان الصغير"><input value={f.subtitle} onChange={e=>set('subtitle',e.target.value)} placeholder="عنوان تمهيدي"/></Field></div><Field label="الوصف"><textarea value={f.body} onChange={e=>set('body',e.target.value)} placeholder="اكتب وصف القسم..."/></Field><div className="admin-grid"><Field label="الأيقونة"><IconPicker value={f.icon} onChange={v=>set('icon',v)}/></Field><Field label="رابط الصورة" hint="يمكن تركه فارغًا إذا لم يحتج القسم لصورة."><input value={f.image} onChange={e=>set('image',e.target.value)} placeholder="https://..."/></Field></div><div className="admin-grid"><Field label="نص الزر"><input value={f.button_text} onChange={e=>set('button_text',e.target.value)} placeholder="اعرف المزيد"/></Field><Field label="رابط الزر"><input value={f.button_url} onChange={e=>set('button_url',e.target.value)} placeholder="/contact"/></Field></div><label className="admin-check"><input type="checkbox" checked={!!f.visible} onChange={e=>set('visible',e.target.checked)}/><span>إظهار القسم على الموقع</span></label>{error&&<div className="admin-error">{error}</div>}<SaveBar editing={!!id} onCancel={cancel} saving={saving}/></SectionCard></form><SectionCard title={`أقسام ${pages.find(x=>x[0]===page)?.[1]||''}`} description="اسحب بصريًا من الترتيب الرقمي: يمكنك تعديل أو إخفاء أو حذف أي قسم.">{items.length?<div className="admin-list">{[...items].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(x=><article className="admin-item" key={x.id}><div className="admin-item-main"><div className="admin-item-icon"><GripVertical size={17}/></div><div><h3>{x.title||'قسم بدون عنوان'}</h3><p>{(x.sort_order||0)} · {types.find(t=>t[0]===x.type)?.[1]||x.type} · {x.subtitle||'بدون عنوان فرعي'}</p></div></div><div className="admin-actions"><StatusBadge tone={x.visible?'success':'neutral'}>{x.visible?'ظاهر':'مخفي'}</StatusBadge><button className="admin-action" onClick={()=>edit(x)}><Pencil size={14}/> تعديل</button><button className="admin-action" onClick={async()=>{await fetch('/api/sections/'+x.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({...x,visible:!x.visible})});load()}}>{x.visible?<EyeOff size={14}/>:<Eye size={14}/>} {x.visible?'إخفاء':'إظهار'}</button><button className="admin-action danger" onClick={()=>del(x.id)}><Trash2 size={14}/> حذف</button></div></article>)}</div>:<div className="admin-empty"><h3>لا توجد أقسام بعد</h3><p>ابدأ بإضافة أول قسم لهذه الصفحة.</p></div>}</SectionCard></>;
 }
