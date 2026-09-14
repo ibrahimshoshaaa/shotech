@@ -1,1 +1,3 @@
-export default function Page(){return <main className="container page"><div className="eyebrow">ABOUT SHOTECH</div><h1>Smart solutions. Powerful systems.</h1><p className="muted">ShoTech Solutions builds practical digital products that help businesses operate better, move faster and grow with confidence.</p></main>}
+import {getSections,getSettings} from '@/lib/site';
+export const dynamic='force-dynamic';
+export default async function Page(){const [sections,settings]=await Promise.all([getSections('about'),getSettings()]);const items=sections.length?sections:[{title:settings.aboutTitle||'Smart solutions. Powerful systems.',body:settings.aboutBody||'',subtitle:'ABOUT SHOTECH'}];return <main className="container page">{items.map((s:any,i:number)=><section className="section" key={s.id||i}><div className="eyebrow">{s.subtitle||'ABOUT SHOTECH'}</div><h1>{s.title}</h1><p className="lead muted" style={{whiteSpace:'pre-wrap'}}>{s.body}</p></section>)}</main>}
