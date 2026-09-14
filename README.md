@@ -62,3 +62,17 @@ CLOUDINARY_API_SECRET=...
 ```bash
 npm run build
 ```
+
+
+## Project image gallery
+
+From **Admin → Projects**, you can select multiple images in one upload. Images are uploaded to Cloudinary and stored as the project's gallery. You can:
+
+- upload up to 10 images at once
+- upload more images later while editing
+- choose any image as the cover
+- change image order
+- remove an image before saving
+- show the complete gallery on the public project details page
+
+The first image becomes the cover automatically unless you select another image.
