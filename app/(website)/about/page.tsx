@@ -1,0 +1,1 @@
+export default function Page(){return <main className="container page"><div className="eyebrow">ABOUT SHOTECH</div><h1>Smart solutions. Powerful systems.</h1><p className="muted">ShoTech Solutions builds practical digital products that help businesses operate better, move faster and grow with confidence.</p></main>}
