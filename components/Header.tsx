@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function Header(){return <header className="container nav"><Link className="brand" href="/">Sho<b>Tech</b></Link><nav className="links"><Link href="/">Home</Link><Link href="/services">Services</Link><Link href="/projects">Projects</Link><Link href="/about">About</Link><Link href="/contact">Contact</Link></nav><Link className="btn" href="/contact">Start a Project</Link></header>}

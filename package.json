@@ -1,0 +1,29 @@
+{
+  "name": "shotech-solutions",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.7",
+    "jose": "^6.0.10",
+    "lucide-react": "^0.468.0",
+    "next": "16.3.4",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "zod": "^3.24.2",
+    "cloudinary": "^2.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "eslint": "^9.19.0",
+    "eslint-config-next": "16.3.4",
+    "typescript": "^5.7.3"
+  }
+}
