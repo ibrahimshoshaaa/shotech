@@ -1,16 +1,5 @@
 'use client';
-import { useRouter } from 'next/navigation';
-
-export default function Page() {
-  const router = useRouter();
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const res = await fetch('/api/auth/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.fromEntries(form)),
-    });
-    if (res.ok) router.push('/admin'); else alert('Invalid credentials');
-  }
-  return <main className="admin-login"><div className="admin-login-card"><div className="admin-login-brand">Sho<span>Tech</span><small>ADMIN PANEL</small></div><h1>Welcome back</h1><p>Sign in to manage your website.</p><form className="form" onSubmit={submit}><input className="input" name="email" type="email" placeholder="Email" required/><input className="input" name="password" type="password" placeholder="Password" required/><button className="btn">Login</button></form></div></main>;
-}
+import {useRouter} from 'next/navigation';
+import {useState} from 'react';
+import {LogIn,ShieldCheck} from 'lucide-react';
+export default function Page(){const router=useRouter();const [error,setError]=useState('');const [loading,setLoading]=useState(false);async function submit(e:React.FormEvent<HTMLFormElement>){e.preventDefault();setError('');setLoading(true);const form=new FormData(e.currentTarget);const res=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(form))});setLoading(false);if(res.ok)router.push('/admin');else setError('البريد الإلكتروني أو كلمة المرور غير صحيحة.')}return <main className="admin-login"><div className="admin-login-card"><div className="admin-login-brand">Sho<span>Tech</span><small>لوحة التحكم</small></div><div className="login-icon"><ShieldCheck size={23}/></div><h1>مرحبًا بعودتك</h1><p>سجّل الدخول لإدارة موقع ShoTech ومحتواه.</p><form onSubmit={submit}><label className="admin-field"><span>البريد الإلكتروني</span><input name="email" type="email" placeholder="admin@example.com" required/></label><label className="admin-field" style={{marginTop:14}}><span>كلمة المرور</span><input name="password" type="password" placeholder="••••••••" required/></label>{error&&<div className="admin-error">{error}</div>}<button className="admin-primary login-submit" disabled={loading}><LogIn size={17}/>{loading?'جاري الدخول...':'تسجيل الدخول'}</button></form></div></main>}
