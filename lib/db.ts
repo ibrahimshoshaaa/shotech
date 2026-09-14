@@ -14,10 +14,20 @@ const schema=[
 const migrations=[`ALTER TABLE services ADD COLUMN content TEXT DEFAULT ''`,`ALTER TABLE services ADD COLUMN slug TEXT`,`ALTER TABLE services ADD COLUMN cover_image TEXT DEFAULT ''`,`ALTER TABLE services ADD COLUMN visible INTEGER DEFAULT 1`];
 let initPromise:Promise<void>|null=null;
 export function ensureDatabase(){if(!initPromise){initPromise=(async()=>{for(const sql of schema)await db.execute(sql);for(const sql of migrations){try{await db.execute(sql)}catch{}}await db.execute(`UPDATE services SET slug=lower(replace(replace(trim(title),' ','-'),'--','-')) WHERE slug IS NULL OR slug=''`);
-// Clean duplicate core homepage rows created by older seeds/edits.
-// Keep the earliest row for each section type; custom sections are untouched.
-for(const type of ['hero','services','about','why','process','projects','cta']){
-  await db.execute(`DELETE FROM site_sections WHERE page='home' AND type=? AND id NOT IN (SELECT MIN(id) FROM site_sections WHERE page='home' AND type=?)`,[type,type]);
+// Core sections are singletons per page. Remove duplicates created by older seeds/edits.
+// Custom sections remain repeatable.
+const coreByPage:[string,string[]][]=[
+  ['home',['hero','services','about','why','process','projects','cta']],
+  ['about',['about']],
+  ['why',['why']],
+  ['process',['process']],
+];
+for(const [page,types] of coreByPage){
+  for(const type of types){
+    await db.execute(`DELETE FROM site_sections WHERE page=? AND type=? AND id NOT IN (SELECT MIN(id) FROM site_sections WHERE page=? AND type=?)`,[page,type,page,type]);
+  }
 }
+// Enforce the same rule at database level so a repeated seed cannot recreate the problem.
+try{await db.execute(`CREATE UNIQUE INDEX IF NOT EXISTS idx_site_sections_core_unique ON site_sections(page,type) WHERE type IN ('hero','services','about','why','process','projects','cta')`)}catch{}
 })().catch(e=>{initPromise=null;throw e})}return initPromise}
 export async function query(sql:string,args:any[]=[]){await ensureDatabase();return db.execute({sql,args})}
