@@ -10,7 +10,7 @@ export default async function Footer() {
       <div className="container">
         <div className="footer-top">
           <div className="footer-brand">
-            <Image src="/shotech-header.png" alt="ShoTech" width={190} height={64} />
+            <Image src="/shotech-mark.png" alt="ShoTech" width={190} height={64} />
             <p>نبني حلولًا رقمية عملية تساعد الشركات على النمو، التنظيم، والتحرك بثقة.</p>
           </div>
           <div className="footer-col">
