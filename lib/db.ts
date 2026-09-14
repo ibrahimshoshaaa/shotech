@@ -7,56 +7,23 @@ if (!url && isVercel) {
   throw new Error('TURSO_DATABASE_URL is required on Vercel. Add TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in Project Settings → Environment Variables.');
 }
 
-export const db = createClient({
-  url: url || 'file:local.db',
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
+export const db = createClient({ url: url || 'file:local.db', authToken: process.env.TURSO_AUTH_TOKEN });
 
 const schema = [
-  `CREATE TABLE IF NOT EXISTS projects (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    slug TEXT NOT NULL UNIQUE,
-    excerpt TEXT,
-    content TEXT,
-    cover_image TEXT,
-    images TEXT DEFAULT '[]',
-    technologies TEXT DEFAULT '[]',
-    category TEXT,
-    demo_url TEXT,
-    github_url TEXT,
-    status TEXT DEFAULT 'draft',
-    featured INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-  )`,
-  `CREATE TABLE IF NOT EXISTS services (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    description TEXT,
-    icon TEXT DEFAULT 'Code2',
-    sort_order INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  )`,
-  `CREATE TABLE IF NOT EXISTS messages (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    phone TEXT,
-    message TEXT NOT NULL,
-    status TEXT DEFAULT 'unread',
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  )`,
-  `CREATE TABLE IF NOT EXISTS settings (
-    key TEXT PRIMARY KEY,
-    value TEXT NOT NULL
-  )`,
-  `INSERT OR IGNORE INTO settings(key,value) VALUES
-    ('companyName','ShoTech Solutions'),
-    ('tagline','Smart Solutions. Powerful Systems.'),
-    ('email',''),('whatsapp',''),('facebook',''),('instagram',''),
-    ('linkedin',''),('github',''),('seoTitle','ShoTech Solutions'),
-    ('seoDescription','Smart digital solutions and powerful systems.')`
+  `CREATE TABLE IF NOT EXISTS projects (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,slug TEXT NOT NULL UNIQUE,excerpt TEXT,content TEXT,cover_image TEXT,images TEXT DEFAULT '[]',technologies TEXT DEFAULT '[]',category TEXT,demo_url TEXT,github_url TEXT,status TEXT DEFAULT 'draft',featured INTEGER DEFAULT 0,created_at TEXT DEFAULT CURRENT_TIMESTAMP,updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+  `CREATE TABLE IF NOT EXISTS services (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,description TEXT,content TEXT DEFAULT '',slug TEXT,cover_image TEXT DEFAULT '',icon TEXT DEFAULT 'Code2',sort_order INTEGER DEFAULT 0,visible INTEGER DEFAULT 1,created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+  `CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,email TEXT NOT NULL,phone TEXT,message TEXT NOT NULL,status TEXT DEFAULT 'unread',created_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+  `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY,value TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS site_sections (id INTEGER PRIMARY KEY AUTOINCREMENT,page TEXT NOT NULL DEFAULT 'home',type TEXT NOT NULL DEFAULT 'custom',title TEXT DEFAULT '',subtitle TEXT DEFAULT '',body TEXT DEFAULT '',icon TEXT DEFAULT '',image TEXT DEFAULT '',button_text TEXT DEFAULT '',button_url TEXT DEFAULT '',data TEXT DEFAULT '{}',sort_order INTEGER DEFAULT 0,visible INTEGER DEFAULT 1,created_at TEXT DEFAULT CURRENT_TIMESTAMP,updated_at TEXT DEFAULT CURRENT_TIMESTAMP)`,
+  `INSERT OR IGNORE INTO settings(key,value) VALUES ('companyName','ShoTech Solutions'),('tagline','Smart Solutions. Powerful Systems.'),('email',''),('whatsapp',''),('facebook',''),('instagram',''),('linkedin',''),('github',''),('seoTitle','ShoTech Solutions'),('seoDescription','Smart digital solutions and powerful systems.'),('aboutTitle','Smart solutions. Powerful systems.'),('aboutBody','ShoTech Solutions builds practical digital products that help businesses operate better, move faster and grow with confidence.'),('processTitle','A clear process. A stronger result.'),('processBody','We discover, design, build and launch digital systems around the real needs of each business.')`,
+  `INSERT OR IGNORE INTO site_sections(page,type,title,subtitle,body,sort_order,visible) VALUES ('home','about','About ShoTech','WHO WE ARE','We build practical digital products and custom systems around the real needs of ambitious businesses.',20,1),('home','why','Why ShoTech','WHY CHOOSE US','Custom-built solutions, clear communication, scalable architecture and a process focused on measurable results.',30,1),('home','process','How we work','OUR PROCESS','Discover, Design, Build and Launch — a simple process with a strong result.',40,1),('home','cta','Let’s build something useful','START A PROJECT','Tell us what you want to build and we will shape the right digital solution.',60,1),('about','about','Smart solutions. Powerful systems.','','ShoTech Solutions builds practical digital products that help businesses operate better, move faster and grow with confidence.',10,1),('process','process','A clear process. A stronger result.','','Discover, Design, Build and Launch — with every step managed around your business goals.',10,1)`
+];
+
+const migrations = [
+  `ALTER TABLE services ADD COLUMN content TEXT DEFAULT ''`,
+  `ALTER TABLE services ADD COLUMN slug TEXT`,
+  `ALTER TABLE services ADD COLUMN cover_image TEXT DEFAULT ''`,
+  `ALTER TABLE services ADD COLUMN visible INTEGER DEFAULT 1`
 ];
 
 let initPromise: Promise<void> | null = null;
@@ -65,15 +32,11 @@ export function ensureDatabase() {
   if (!initPromise) {
     initPromise = (async () => {
       for (const sql of schema) await db.execute(sql);
-    })().catch((error) => {
-      initPromise = null;
-      throw error;
-    });
+      for (const sql of migrations) { try { await db.execute(sql); } catch {} }
+      await db.execute(`UPDATE services SET slug=lower(replace(replace(trim(title),' ','-'),'--','-')) WHERE slug IS NULL OR slug=''`);
+    })().catch((error) => { initPromise = null; throw error; });
   }
   return initPromise;
 }
 
-export async function query(sql: string, args: any[] = []) {
-  await ensureDatabase();
-  return db.execute({ sql, args });
-}
+export async function query(sql: string,args: any[] = []) { await ensureDatabase(); return db.execute({sql,args}); }
