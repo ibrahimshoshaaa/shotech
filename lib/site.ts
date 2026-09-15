@@ -1,80 +1,16 @@
 import { unstable_cache } from 'next/cache';
 import { query } from './db';
 import { CACHE_REVALIDATE_SECONDS, siteTags } from './site-cache';
-
-const getSettingsCached = unstable_cache(
-  async () => {
-    const r = await query('SELECT key,value FROM settings');
-    return Object.fromEntries(r.rows.map((x: any) => [x.key, x.value]));
-  },
-  ['site-settings'],
-  { revalidate: CACHE_REVALIDATE_SECONDS, tags: [siteTags.settings] }
-);
-
-const getServicesCached = unstable_cache(
-  async () => (await query('SELECT * FROM services WHERE visible=1 ORDER BY sort_order,id')).rows as any[],
-  ['site-services'],
-  { revalidate: CACHE_REVALIDATE_SECONDS, tags: [siteTags.services] }
-);
-
-const getProjectsAllCached = unstable_cache(
-  async () => (await query("SELECT * FROM projects WHERE status='published' ORDER BY created_at DESC")).rows as any[],
-  ['site-projects-all'],
-  { revalidate: CACHE_REVALIDATE_SECONDS, tags: [siteTags.projects] }
-);
-
-const getFeaturedProjectsCached = unstable_cache(
-  async () => (await query("SELECT * FROM projects WHERE status='published' AND featured=1 ORDER BY created_at DESC")).rows as any[],
-  ['site-projects-featured'],
-  { revalidate: CACHE_REVALIDATE_SECONDS, tags: [siteTags.projects] }
-);
-
-export async function getSettings() {
-  return getSettingsCached();
-}
-
-export async function getServices() {
-  return getServicesCached();
-}
-
-export async function getService(slug: string) {
-  const getCached = unstable_cache(
-    async () => (await query('SELECT * FROM services WHERE slug=? AND visible=1', [slug])).rows[0] as any,
-    ['site-service', slug],
-    { revalidate: CACHE_REVALIDATE_SECONDS, tags: [siteTags.services, siteTags.service(slug)] }
-  );
-  return getCached();
-}
-
-export async function getProjects(featured = false) {
-  return featured ? getFeaturedProjectsCached() : getProjectsAllCached();
-}
-
-export async function getProject(slug: string) {
-  const getCached = unstable_cache(
-    async () => (await query("SELECT * FROM projects WHERE slug=? AND status='published'", [slug])).rows[0] as any,
-    ['site-project', slug],
-    { revalidate: CACHE_REVALIDATE_SECONDS, tags: [siteTags.projects, siteTags.project(slug)] }
-  );
-  return getCached();
-}
-
-export async function getSections(page = 'home') {
-  const getCached = unstable_cache(
-    async () => {
-      const core = ['hero', 'services', 'about', 'why', 'process', 'projects', 'cta'];
-      const placeholders = core.map(() => '?').join(',');
-      const sql = `SELECT * FROM site_sections
-        WHERE page=? AND visible=1
-        AND (type NOT IN (${placeholders}) OR id IN (
-          SELECT MIN(id) FROM site_sections WHERE page=? AND type IN (${placeholders}) GROUP BY type
-        ) OR ? <> 'home')
-        ORDER BY sort_order,id`;
-      const args = [page, ...core, page, ...core, page];
-      return (await query(sql, args)).rows as any[];
-    },
-    ['site-sections', page],
-    { revalidate: CACHE_REVALIDATE_SECONDS, tags: [siteTags.sections(page)] }
-  );
-  return getCached();
-}
+import type { Locale } from './i18n';
+const getSettingsCached=unstable_cache(async()=>{const r=await query('SELECT key,value FROM settings');return Object.fromEntries(r.rows.map((x:any)=>[x.key,x.value]));},['site-settings'],{revalidate:CACHE_REVALIDATE_SECONDS,tags:[siteTags.settings]});
+const getServicesCached=unstable_cache(async()=>(await query('SELECT * FROM services WHERE visible=1 ORDER BY sort_order,id')).rows as any[],['site-services'],{revalidate:CACHE_REVALIDATE_SECONDS,tags:[siteTags.services]});
+const getProjectsAllCached=unstable_cache(async()=>(await query("SELECT * FROM projects WHERE status='published' ORDER BY created_at DESC")).rows as any[],['site-projects-all'],{revalidate:CACHE_REVALIDATE_SECONDS,tags:[siteTags.projects]});
+const getFeaturedProjectsCached=unstable_cache(async()=>(await query("SELECT * FROM projects WHERE status='published' AND featured=1 ORDER BY created_at DESC")).rows as any[],['site-projects-featured'],{revalidate:CACHE_REVALIDATE_SECONDS,tags:[siteTags.projects]});
+export async function getSettings(){return getSettingsCached();}
+function serviceLocale(x:any,locale:Locale){return locale==='en'?{...x,title:x.title_en||x.title,description:x.description_en||x.description,content:x.content_en||x.content}:x;}
+function projectLocale(x:any,locale:Locale){return locale==='en'?{...x,title:x.title_en||x.title,excerpt:x.excerpt_en||x.excerpt,content:x.content_en||x.content,category:x.category_en||x.category}:x;}
+export async function getServices(locale:Locale='ar'){return (await getServicesCached()).map(x=>serviceLocale(x,locale));}
+export async function getService(slug:string,locale:Locale='ar'){const c=unstable_cache(async()=>(await query('SELECT * FROM services WHERE slug=? AND visible=1',[slug])).rows[0] as any,['site-service',slug],{revalidate:CACHE_REVALIDATE_SECONDS,tags:[siteTags.services,siteTags.service(slug)]});const x=await c();return x?serviceLocale(x,locale):x;}
+export async function getProjects(featured=false,locale:Locale='ar'){return (featured?await getFeaturedProjectsCached():await getProjectsAllCached()).map(x=>projectLocale(x,locale));}
+export async function getProject(slug:string,locale:Locale='ar'){const c=unstable_cache(async()=>(await query("SELECT * FROM projects WHERE slug=? AND status='published'",[slug])).rows[0] as any,['site-project',slug],{revalidate:CACHE_REVALIDATE_SECONDS,tags:[siteTags.projects,siteTags.project(slug)]});const x=await c();return x?projectLocale(x,locale):x;}
+export async function getSections(page='home',locale:Locale='ar'){const c=unstable_cache(async()=>{const core=['hero','services','about','why','process','projects','cta'];const p=core.map(()=>'?').join(',');const sql=`SELECT * FROM site_sections WHERE page=? AND visible=1 AND (type NOT IN (${p}) OR id IN (SELECT MIN(id) FROM site_sections WHERE page=? AND type IN (${p}) GROUP BY type) OR ? <> 'home') ORDER BY sort_order,id`;return (await query(sql,[page,...core,page,...core,page])).rows as any[];},['site-sections',page],{revalidate:CACHE_REVALIDATE_SECONDS,tags:[siteTags.sections(page)]});const rows=await c();return rows.map((x:any)=>locale==='en'?{...x,title:x.title_en||x.title,subtitle:x.subtitle_en||x.subtitle,body:x.body_en||x.body,button_text:x.button_text_en||x.button_text}:x);}
