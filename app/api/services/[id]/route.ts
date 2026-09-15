@@ -1,6 +1,25 @@
 import {query} from '@/lib/db';
 import {isAdmin} from '@/lib/admin';
 import {slugify} from '@/lib/utils';
+import { invalidateServicesCache } from '@/lib/site-cache';
 
-export async function PUT(req:Request,{params}:{params:Promise<{id:string}>}){if(!await isAdmin())return Response.json({error:'Unauthorized'},{status:401});const {id}=await params,b=await req.json();await query('UPDATE services SET title=?,description=?,content=?,slug=?,cover_image=?,icon=?,sort_order=?,visible=? WHERE id=?',[b.title,b.description||'',b.content||'',slugify(b.slug||b.title),b.cover_image||'',b.icon||'Code2',Number(b.sort_order||0),b.visible===false?0:1,id]);return Response.json({ok:true})}
-export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){if(!await isAdmin())return Response.json({error:'Unauthorized'},{status:401});const {id}=await params;await query('DELETE FROM services WHERE id=?',[id]);return Response.json({ok:true})}
+export async function PUT(req:Request,{params}:{params:Promise<{id:string}>}){
+  if(!await isAdmin())return Response.json({error:'Unauthorized'},{status:401});
+  const {id}=await params,b=await req.json();
+  const old=await query('SELECT slug FROM services WHERE id=?',[id]);
+  const slug=slugify(b.slug||b.title);
+  await query('UPDATE services SET title=?,description=?,content=?,slug=?,cover_image=?,icon=?,sort_order=?,visible=? WHERE id=?',[b.title,b.description||'',b.content||'',slug,b.cover_image||'',b.icon||'Code2',Number(b.sort_order||0),b.visible===false?0:1,id]);
+  invalidateServicesCache(slug);
+  const oldSlug=(old.rows[0] as any)?.slug;
+  if(oldSlug&&oldSlug!==slug)invalidateServicesCache(oldSlug);
+  return Response.json({ok:true});
+}
+
+export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){
+  if(!await isAdmin())return Response.json({error:'Unauthorized'},{status:401});
+  const {id}=await params;
+  const old=await query('SELECT slug FROM services WHERE id=?',[id]);
+  await query('DELETE FROM services WHERE id=?',[id]);
+  invalidateServicesCache((old.rows[0] as any)?.slug);
+  return Response.json({ok:true});
+}
