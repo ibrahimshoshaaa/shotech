@@ -1,15 +1,14 @@
-import { query } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ProjectGallery from './project-gallery';
 import { ArrowLeft } from 'lucide-react';
+import { getProject } from '@/lib/site';
 
 export const dynamic='force-dynamic';
 
 export default async function Page({params}:{params:Promise<{slug:string}>}){
   const {slug}=await params;
-  const r=await query("SELECT * FROM projects WHERE slug=? AND status='published'",[slug]);
-  const p:any=r.rows[0];
+  const p:any=await getProject(slug);
   if(!p)notFound();
 
   let tech:string[]=[],images:string[]=[];
