@@ -8,11 +8,8 @@ import { useState } from 'react';
 const links = [
   ['الرئيسية', '/'],
   ['خدماتنا', '/services'],
-  ['من نحن', '/about'],
-  ['طريقة شغلنا', '/process'],
   ['أعمالنا', '/projects'],
-  ['لماذا ShoTech', '/why'],
-  ['الأسئلة الشائعة', '/faq'],
+  ['من نحن', '/about'],
   ['تواصل معنا', '/contact'],
 ];
 
