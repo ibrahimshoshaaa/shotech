@@ -1,5 +1,6 @@
 import './globals.css';
 import './website.css';
+import './section-headings.css';
 import './admin/admin.css';
 import type { Metadata } from 'next';
 export const metadata: Metadata = {title:'ShoTech Solutions | حلول رقمية تبني فرقًا',description:'ShoTech تبني مواقع وأنظمة وحلولًا رقمية عملية تساعد الشركات على النمو.'};
