@@ -5,6 +5,10 @@ import { getServiceIcon } from '@/lib/service-icons';
 
 export const dynamic = 'force-dynamic';
 
+function titleSize(title: string) {
+  return Math.max(12, Math.min(20, 430 / Math.max(title.length, 1)));
+}
+
 export default async function ServicesPage() {
   const services = await getServices();
 
@@ -25,14 +29,20 @@ export default async function ServicesPage() {
         <div className="container">
           {services.length > 0 ? (
             <div className="cards">
-              {services.map((service: any, index: number) => {
+              {services.map((service: any) => {
                 const Icon = getServiceIcon(service.icon);
+                const size = titleSize(service.title || '');
                 return (
                   <article className="service-card" key={service.id}>
-                    <span className="service-number">{String(index + 1).padStart(2, '0')}</span>
-                    <div className="service-icon"><Icon size={25} /></div>
-                    <h3>{service.title}</h3>
-                    <p>{service.description || 'حل رقمي مصمم حسب احتياج مشروعك.'}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                      <div className="service-icon" style={{ flex: '0 0 54px' }}>
+                        <Icon size={25} />
+                      </div>
+                      <h3 style={{ margin: 0, flex: 1, minWidth: 0, fontSize: `${size}px`, lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {service.title}
+                      </h3>
+                    </div>
+                    <p style={{ marginTop: 22 }}>{service.description || 'حل رقمي مصمم حسب احتياج مشروعك.'}</p>
                     <Link className="card-link" href={`/services/${service.slug}`}>
                       تفاصيل الخدمة <ArrowLeft size={16} />
                     </Link>
