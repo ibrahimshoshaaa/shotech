@@ -1,0 +1,23 @@
+/* ShoTech section heading treatment */
+.website-shell .section-head{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;margin-bottom:42px}
+.website-shell .section-head>div{max-width:800px;width:100%}
+.website-shell .section-head>.muted,.website-shell .section-head>p{max-width:650px;margin:0}
+.website-shell .section-head .eyebrow{display:block;color:#111;font-size:clamp(28px,3.2vw,42px);font-weight:800;letter-spacing:-1.2px;line-height:1.2;margin:0 0 12px}
+.website-shell .section-head .eyebrow:before{display:none}
+.website-shell .section-head h2{margin:0}
+.website-shell .section-head .btn{margin-top:8px}
+
+.website-shell .page-hero .eyebrow{display:block;color:#111;font-size:clamp(26px,3vw,38px);font-weight:800;letter-spacing:-1px}
+.website-shell .page-hero .eyebrow:before{display:none}
+
+.website-shell .split>.split-visual + div>.eyebrow{display:block;color:#111;font-size:28px;font-weight:800;letter-spacing:-1px}
+.website-shell .split>.split-visual + div>.eyebrow:before{display:none}
+
+@media(max-width:760px){
+  .website-shell .section-head{gap:11px;margin-bottom:30px}
+  .website-shell .section-head .eyebrow{font-size:28px}
+  .website-shell .section-head h2{font-size:clamp(30px,8vw,40px)}
+  .website-shell .section-head>.muted,.website-shell .section-head>p{font-size:13px;line-height:1.8}
+  .website-shell .page-hero .eyebrow{font-size:27px}
+  .website-shell .split>.split-visual + div>.eyebrow{font-size:25px}
+}
