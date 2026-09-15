@@ -9,9 +9,28 @@
 
 .website-shell .page-hero .eyebrow{display:block;color:#111;font-size:clamp(26px,3vw,38px);font-weight:800;letter-spacing:-1px}
 .website-shell .page-hero .eyebrow:before{display:none}
-
 .website-shell .split>.split-visual + div>.eyebrow{display:block;color:#111;font-size:28px;font-weight:800;letter-spacing:-1px}
 .website-shell .split>.split-visual + div>.eyebrow:before{display:none}
+
+/* Hero: remove the small label and lift the main copy slightly. */
+.website-shell .hero .hero-copy{transform:translateY(-34px)}
+
+/* About: no small "مين إحنا؟" eyebrow remains. */
+.website-shell .about-section .about-content{max-width:820px;margin:0 auto;text-align:center}
+.website-shell .about-section .about-content h2{font-size:clamp(36px,4.5vw,58px);line-height:1.15;letter-spacing:-2px;margin:0 0 18px}
+.website-shell .about-section .about-content>.muted{max-width:700px;margin:0 auto}
+.website-shell .about-section .check-list{text-align:right;max-width:720px;margin:32px auto}
+.website-shell .about-section .btn{margin-top:4px}
+
+/* Process: keep the cards visually connected as real steps, without numbered badges. */
+.website-shell .steps{position:relative}
+.website-shell .steps .step{position:relative;min-height:245px;padding:30px 28px}
+.website-shell .steps .step-top{display:flex;align-items:center;gap:10px;height:18px}
+.website-shell .steps .step-dot{width:9px;height:9px;border-radius:50%;background:#111;display:block;flex:0 0 9px}
+.website-shell .steps .step-label{font:800 10px Manrope,Arial,sans-serif;letter-spacing:1.4px;color:#777}
+.website-shell .steps .step:not(:last-child):after{content:'';position:absolute;top:38px;left:18px;width:calc(100% - 18px);height:1px;background:#d9d9d6}
+.website-shell .steps .step h3{position:relative;z-index:1;margin:30px 0 10px;font-size:23px}
+.website-shell .steps .step p{position:relative;z-index:1}
 
 /* Website buttons: monochrome identity, no legacy gradients/glows. */
 .website-shell .btn,
@@ -38,4 +57,10 @@
   .website-shell .section-head>.muted,.website-shell .section-head>p{font-size:13px;line-height:1.8}
   .website-shell .page-hero .eyebrow{font-size:27px}
   .website-shell .split>.split-visual + div>.eyebrow{font-size:25px}
+  .website-shell .hero .hero-copy{transform:translateY(-18px)}
+  .website-shell .about-section .about-content h2{font-size:34px}
+  .website-shell .about-section .check-list{text-align:right}
+  .website-shell .steps{display:grid}
+  .website-shell .steps .step{min-height:210px;padding:25px 22px}
+  .website-shell .steps .step:not(:last-child):after{display:none}
 }
