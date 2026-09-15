@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUpLeft, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 import { getSettings } from '@/lib/site';
 
 export default async function Footer() {
@@ -23,7 +23,6 @@ export default async function Footer() {
             <a href={`tel:${settings.whatsapp || ''}`}><Phone size={16}/>{settings.whatsapp || 'واتساب'}</a>
             <span><MapPin size={16}/>مصر · نخدم عملاءنا أينما كانوا</span>
           </div>
-          <Link className="footer-cta" href="/contact"><span>جاهز نبدأ؟</span><ArrowUpLeft size={23}/></Link>
         </div>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} ShoTech. جميع الحقوق محفوظة.</span>
