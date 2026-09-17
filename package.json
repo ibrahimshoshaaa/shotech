@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "db:init": "tsx scripts/init-db.ts",
     "auth:hash": "tsx scripts/hash-password.ts"
   },
