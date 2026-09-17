@@ -1,16 +1,12 @@
+import { scryptSync, timingSafeEqual } from 'node:crypto';
 import { createToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
-// ── In-memory rate limiter ─────────────────────────────────────────────────
-// Tracks failed attempts per IP. Resets automatically after WINDOW_MS.
-// (Sufficient for a single-admin site; replace with Redis/Upstash for multi-instance.)
-
 const MAX_ATTEMPTS = 5;
-const WINDOW_MS    = 15 * 60 * 1000; // 15 minutes
-
+const WINDOW_MS = 15 * 60 * 1000;
 const attempts = new Map<string, { count: number; resetAt: number }>();
 
-function getIP(req: Request): string {
+function getIP(req: Request) {
   return (
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     req.headers.get('x-real-ip') ||
@@ -18,11 +14,10 @@ function getIP(req: Request): string {
   );
 }
 
-function checkRateLimit(ip: string): { allowed: boolean; retryAfterSec: number } {
-  const now  = Date.now();
+function checkRateLimit(ip: string) {
+  const now = Date.now();
   const entry = attempts.get(ip);
 
-  // First attempt or window expired — reset
   if (!entry || now > entry.resetAt) {
     attempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
     return { allowed: true, retryAfterSec: 0 };
@@ -40,7 +35,34 @@ function resetAttempts(ip: string) {
   attempts.delete(ip);
 }
 
-// ── Route handler ──────────────────────────────────────────────────────────
+function safeEqual(a: Buffer, b: Buffer) {
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+function verifyPassword(password: string) {
+  const stored = process.env.ADMIN_PASSWORD_HASH;
+
+  if (stored) {
+    const [algorithm, saltHex, hashHex] = stored.split('$');
+    if (algorithm !== 'scrypt' || !saltHex || !hashHex) return false;
+
+    try {
+      const hash = scryptSync(password, Buffer.from(saltHex, 'hex'), 64, {
+        N: 16384,
+        r: 8,
+        p: 1,
+      });
+      return safeEqual(hash, Buffer.from(hashHex, 'hex'));
+    } catch {
+      return false;
+    }
+  }
+
+  // Plaintext password fallback is development-only. Production must use a hash.
+  if (process.env.NODE_ENV === 'production') return false;
+  return safeEqual(Buffer.from(password), Buffer.from(process.env.ADMIN_PASSWORD || ''));
+}
+
 export async function POST(req: Request) {
   const ip = getIP(req);
   const { allowed, retryAfterSec } = checkRateLimit(ip);
@@ -48,34 +70,38 @@ export async function POST(req: Request) {
   if (!allowed) {
     return Response.json(
       { error: `Too many failed attempts. Try again in ${Math.ceil(retryAfterSec / 60)} minutes.` },
-      {
-        status: 429,
-        headers: { 'Retry-After': String(retryAfterSec) },
-      },
+      { status: 429, headers: { 'Retry-After': String(retryAfterSec) } },
     );
   }
 
-  const { email, password } = await req.json();
+  try {
+    const body = await req.json();
+    const email = typeof body.email === 'string' ? body.email : '';
+    const password = typeof body.password === 'string' ? body.password : '';
 
-  if (
-    email    !== process.env.ADMIN_EMAIL ||
-    password !== process.env.ADMIN_PASSWORD
-  ) {
-    return Response.json({ error: 'Invalid credentials' }, { status: 401 });
+    const validEmail = safeEqual(
+      Buffer.from(email),
+      Buffer.from(process.env.ADMIN_EMAIL || ''),
+    );
+
+    if (!validEmail || !verifyPassword(password)) {
+      return Response.json({ error: 'Invalid credentials' }, { status: 401 });
+    }
+
+    resetAttempts(ip);
+    const token = await createToken();
+    const cookieStore = await cookies();
+
+    cookieStore.set('shotech_admin', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 604800,
+    });
+
+    return Response.json({ ok: true });
+  } catch {
+    return Response.json({ error: 'Invalid request.' }, { status: 400 });
   }
-
-  // Successful login — clear the failure counter
-  resetAttempts(ip);
-
-  const token = await createToken();
-  const c = await cookies();
-  c.set('shotech_admin', token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure:   process.env.NODE_ENV === 'production',
-    path:     '/',
-    maxAge:   604800, // 7 days
-  });
-
-  return Response.json({ ok: true });
 }

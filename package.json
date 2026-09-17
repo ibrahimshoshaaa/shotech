@@ -2,12 +2,16 @@
   "name": "shotech-solutions",
   "version": "1.0.0",
   "private": true,
+  "engines": {"node": ">=24"},
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "db:init": "tsx scripts/init-db.ts"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:init": "tsx scripts/init-db.ts",
+    "auth:hash": "tsx scripts/hash-password.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.15.7",
@@ -26,6 +30,7 @@
     "eslint": "^9.19.0",
     "eslint-config-next": "16.3.4",
     "typescript": "^5.7.3",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "prettier": "^3.6.2"
   }
 }

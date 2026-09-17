@@ -1,4 +1,5 @@
 'use client';
+import './admin.css';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
 import {LayoutDashboard,PanelsTopLeft,BriefcaseBusiness,FolderKanban,Inbox,Settings,ExternalLink} from 'lucide-react';

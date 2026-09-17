@@ -1,5 +1,9 @@
 import { SignJWT, jwtVerify } from 'jose';
 
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is required in production.');
+}
+
 const secret = new TextEncoder().encode(
   process.env.JWT_SECRET || 'dev-only-change-me',
 );
@@ -14,7 +18,9 @@ export async function createToken(): Promise<string> {
 
 export async function verifyToken(token?: string): Promise<boolean> {
   try {
-    return !!token && !!(await jwtVerify(token, secret));
+    if (!token) return false;
+    const { payload } = await jwtVerify(token, secret);
+    return payload.role === 'admin';
   } catch {
     return false;
   }
