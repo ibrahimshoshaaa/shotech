@@ -1,4 +1,4 @@
-import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
+import { scryptSync, timingSafeEqual } from 'node:crypto';
 import { createToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
