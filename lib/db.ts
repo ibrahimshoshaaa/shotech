@@ -1,4 +1,4 @@
-import { createClient } from '@libsql/client';
+import { createClient, type InArgs } from '@libsql/client';
 
 // ── Connection ─────────────────────────────────────────────────────────────
 const url = process.env.TURSO_DATABASE_URL;
@@ -258,8 +258,8 @@ export function ensureDatabase(): Promise<void> {
   return initPromise;
 }
 
-// ── Convenience query wrapper ───────────────────────────────────────────────
-export async function query(sql: string, args: unknown[] = []) {
+// ── Convenience query wrapper ───────────────────────────────────────────────export async function query(sql: string, args: InArgs = []) {
+export async function query(sql: string, args: InArgs = []) {
   await ensureDatabase();
   return db.execute({ sql, args });
 }
