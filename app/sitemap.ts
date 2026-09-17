@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { query } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://shotechsolutions.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
