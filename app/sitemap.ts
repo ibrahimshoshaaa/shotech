@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic: services
   const servicesRows = (
     await query("SELECT slug FROM services WHERE visible = 1 AND slug IS NOT NULL AND slug != ''")
-  ).rows as { slug: string }[];
+    ).rows as unknown as { slug: string }[];
 
   const servicePages: MetadataRoute.Sitemap = servicesRows.map(({ slug }) => ({
     url:             `${BASE_URL}/services/${slug}`,
@@ -28,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic: projects
   const projectRows = (
     await query("SELECT slug, updated_at FROM projects WHERE status = 'published'")
-  ).rows as { slug: string; updated_at: string }[];
+    ).rows as unknown as { slug: string; updated_at: string }[];
 
   const projectPages: MetadataRoute.Sitemap = projectRows.map(({ slug, updated_at }) => ({
     url:             `${BASE_URL}/projects/${slug}`,
