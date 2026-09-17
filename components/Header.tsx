@@ -85,9 +85,11 @@ export default function Header({ locale }: { locale: Locale }) {
         @media (max-width: 900px) {
           .website-shell .site-header .nav {
             width: 100%;
+            max-width: none;
             min-width: 0;
-            direction: ltr !important;
-            justify-content: flex-start;
+            margin: 0;
+            padding: 0 16px;
+            justify-content: space-between;
           }
 
           .website-shell .site-header .nav-links {
@@ -99,8 +101,7 @@ export default function Header({ locale }: { locale: Locale }) {
             align-items: center;
             flex: 0 0 auto;
             gap: 10px;
-            direction: ltr;
-            margin-left: auto;
+            margin: 0;
           }
 
           .website-shell .site-header .nav-cta {
@@ -117,11 +118,6 @@ export default function Header({ locale }: { locale: Locale }) {
           .website-shell .site-header .brand {
             flex: 0 0 auto;
             min-width: 0;
-            order: 1;
-          }
-
-          .website-shell .site-header .nav-actions {
-            order: 2;
           }
 
           .website-shell .site-header .brand img {
