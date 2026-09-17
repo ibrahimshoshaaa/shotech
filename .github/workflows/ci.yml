@@ -1,4 +1,4 @@
-name: Build check
+name: CI
 
 on:
   push:
@@ -9,14 +9,36 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
       - name: Build
         run: npm run build
+        env:
+          # Provide dummy values so Next.js build doesn't throw on missing env vars.
+          # Real secrets live in Vercel environment variables.
+          TURSO_DATABASE_URL: libsql://placeholder.turso.io
+          TURSO_AUTH_TOKEN: placeholder
+          JWT_SECRET: ci-placeholder-secret
+          ADMIN_EMAIL: ci@example.com
+          ADMIN_PASSWORD: CiPlaceholder1!
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: placeholder
+          CLOUDINARY_API_KEY: placeholder
+          CLOUDINARY_API_SECRET: placeholder
