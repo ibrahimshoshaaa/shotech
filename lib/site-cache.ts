@@ -13,22 +13,22 @@ export const siteTags = {
 };
 
 export function invalidateSettingsCache() {
-  revalidateTag(siteTags.settings);
+  revalidateTag(siteTags.settings, 'max');
 }
 
 export function invalidateServicesCache(slug?: string) {
-  revalidateTag(siteTags.services);
-  if (slug) revalidateTag(siteTags.service(slug));
+  revalidateTag(siteTags.services, 'max');
+  if (slug) revalidateTag(siteTags.service(slug), 'max');
 }
 
 export function invalidateProjectsCache(slug?: string) {
-  revalidateTag(siteTags.projects);
-  if (slug) revalidateTag(siteTags.project(slug));
+  revalidateTag(siteTags.projects, 'max');
+  if (slug) revalidateTag(siteTags.project(slug), 'max');
 }
 
 export function invalidateSectionsCache(page?: string) {
   const pages = page ? [page] : ['home', 'about', 'why', 'process'];
   for (const p of pages) {
-    revalidateTag(siteTags.sections(p));
+    revalidateTag(siteTags.sections(p), 'max');
   }
 }
