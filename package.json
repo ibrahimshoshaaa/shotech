@@ -2,7 +2,7 @@
   "name": "shotech-solutions",
   "version": "1.0.0",
   "private": true,
-  "engines": {"node": ">=20"},
+  "engines": {"node": ">=24"},
   "scripts": {
     "dev": "next dev",
     "build": "next build",
