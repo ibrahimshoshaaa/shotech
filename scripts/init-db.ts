@@ -10,9 +10,7 @@ async function executeSchema() {
     .map((statement) => statement.trim())
     .filter(Boolean);
 
-  for (const sql of statements) {
-    await db.execute(sql);
-  }
+  for (const sql of statements) await db.execute(sql);
 }
 
 const migrations = [
@@ -68,6 +66,11 @@ async function backfillServices() {
     await db.execute('UPDATE services SET slug=? WHERE id=?', [candidate, row.id]);
     seen.add(candidate);
   }
+
+  await db.execute(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_services_slug_unique
+     ON services(slug) WHERE slug IS NOT NULL AND slug <> ''`,
+  );
 }
 
 async function backfillSections() {
