@@ -1,5 +1,5 @@
 import {query} from '@/lib/db';
-import {FolderKanban,BriefcaseBusiness,Inbox,PanelsTopLeft,ArrowUpLeft} from 'lucide-react';
+import {FolderKanban,BriefcaseBusiness,Inbox,ArrowUpLeft} from 'lucide-react';
 import {PageHeader,QuickLink,StatusBadge} from '@/components/admin/AdminUI';
 export const dynamic='force-dynamic';
 export default async function Page(){
