@@ -2,15 +2,14 @@
   "name": "shotech-solutions",
   "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": ">=20"
-  },
+  "engines": {"node": ">=20"},
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "db:init": "tsx scripts/init-db.ts"
+    "db:init": "tsx scripts/init-db.ts",
+    "auth:hash": "tsx scripts/hash-password.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.15.7",
