@@ -86,6 +86,7 @@ export default function Header({ locale }: { locale: Locale }) {
           .website-shell .site-header .nav {
             width: 100%;
             min-width: 0;
+            direction: ltr !important;
           }
 
           .website-shell .site-header .nav-links {
@@ -97,6 +98,7 @@ export default function Header({ locale }: { locale: Locale }) {
             align-items: center;
             flex: 0 0 auto;
             gap: 10px;
+            direction: ltr;
           }
 
           .website-shell .site-header .nav-cta {
