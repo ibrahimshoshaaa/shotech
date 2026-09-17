@@ -32,6 +32,12 @@ CREATE TABLE IF NOT EXISTS site_sections (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP, updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_projects_created_at ON projects(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_projects_status_featured ON projects(status, featured);
+CREATE INDEX IF NOT EXISTS idx_services_sort_visible ON services(sort_order, visible);
+CREATE INDEX IF NOT EXISTS idx_site_sections_page_sort ON site_sections(page, sort_order);
+
 INSERT OR IGNORE INTO settings (key, value) VALUES
 ('companyName','ShoTech Solutions'),('companyName_en','ShoTech Solutions'),
 ('tagline','حلول ذكية. أنظمة قوية.'),('tagline_en','Smart solutions. Powerful systems.'),
