@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "format": "prettier --write .",
     "db:init": "tsx scripts/init-db.ts",
     "auth:hash": "tsx scripts/hash-password.ts"
   },
@@ -28,6 +29,7 @@
     "eslint": "^9.19.0",
     "eslint-config-next": "16.3.4",
     "typescript": "^5.7.3",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "prettier": "^3.6.2"
   }
 }
