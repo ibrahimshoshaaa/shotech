@@ -92,8 +92,43 @@ export default function Header({ locale }: { locale: Locale }) {
             justify-content: space-between;
           }
 
+          .website-shell .site-header .nav {
+            position: relative;
+          }
+
           .website-shell .site-header .nav-links {
             display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 16px;
+            right: 16px;
+            z-index: 60;
+            flex-direction: column;
+            gap: 0;
+            padding: 8px;
+            border: 1px solid rgba(140,155,210,.18);
+            border-radius: 16px;
+            background: rgba(8,12,30,.97);
+            box-shadow: 0 18px 45px rgba(0,0,0,.35);
+            backdrop-filter: blur(18px);
+          }
+
+          .website-shell .site-header .nav-links.is-open {
+            display: flex;
+          }
+
+          .website-shell .site-header .nav-links a {
+            display: block;
+            width: 100%;
+            padding: 14px 15px;
+            border-radius: 10px;
+            color: #c5d1ef;
+          }
+
+          .website-shell .site-header .nav-links a:hover,
+          .website-shell .site-header .nav-links a.active {
+            background: rgba(54,196,255,.08);
+            color: #fff;
           }
 
           .website-shell .site-header .nav-actions {
