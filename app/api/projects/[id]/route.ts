@@ -3,30 +3,5 @@ import { json, slugify } from '@/lib/utils';
 import { isAdmin } from '@/lib/admin';
 import { invalidateProjectsCache } from '@/lib/site-cache';
 import { projectSchema } from '@/lib/validation';
-
-export async function PUT(req: Request,{params}:{params:Promise<{id:string}>}) {
-  try {
-    if (!await isAdmin()) return Response.json({error:'Unauthorized'},{status:401});
-    const {id}=await params;
-    const parsed=projectSchema.safeParse(await req.json());
-    if (!parsed.success) return Response.json({error:'Invalid project data.',details:parsed.error.flatten()},{status:400});
-    const b=parsed.data, old=await query('SELECT slug FROM projects WHERE id=?',[id]), slug=slugify(b.slug||b.title);
-    const duplicate=await query('SELECT id FROM projects WHERE slug=? AND id<>? LIMIT 1',[slug,id]);
-    if (duplicate.rows.length) return Response.json({error:'A project with this slug already exists.'},{status:409});
-    await query('UPDATE projects SET title=?,title_en=?,slug=?,excerpt=?,excerpt_en=?,content=?,content_en=?,cover_image=?,images=?,technologies=?,category=?,category_en=?,demo_url=?,github_url=?,status=?,featured=?,updated_at=CURRENT_TIMESTAMP WHERE id=?',[b.title,b.title_en,slug,b.excerpt,b.excerpt_en,b.content,b.content_en,b.cover_image,json(b.images),json(b.technologies),b.category,b.category_en,b.demo_url,b.github_url,b.status,b.featured?1:0,id]);
-    invalidateProjectsCache(slug);
-    const oldSlug=(old.rows[0] as any)?.slug;
-    if(oldSlug&&oldSlug!==slug) invalidateProjectsCache(oldSlug);
-    return Response.json({ok:true});
-  } catch { return Response.json({error:'Unable to update project.'},{status:400}); }
-}
-
-export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}) {
-  try {
-    if(!await isAdmin()) return Response.json({error:'Unauthorized'},{status:401});
-    const {id}=await params, old=await query('SELECT slug FROM projects WHERE id=?',[id]);
-    await query('DELETE FROM projects WHERE id=?',[id]);
-    invalidateProjectsCache((old.rows[0] as any)?.slug);
-    return Response.json({ok:true});
-  } catch { return Response.json({error:'Unable to delete project.'},{status:400}); }
-}
+export async function PUT(req:Request,{params}:{params:Promise<{id:string}>}){try{if(!await isAdmin())return Response.json({error:'Unauthorized'},{status:401});const{id}=await params,parsed=projectSchema.safeParse(await req.json());if(!parsed.success)return Response.json({error:'Invalid project data.',details:parsed.error.flatten()},{status:400});const b=parsed.data,old=await query('SELECT slug FROM projects WHERE id=?',[id]);if(!old.rows.length)return Response.json({error:'Project not found.'},{status:404});const slug=slugify(b.slug||b.title);if(!slug)return Response.json({error:'A valid title or slug is required.'},{status:400});const duplicate=await query('SELECT id FROM projects WHERE slug=? AND id<>? LIMIT 1',[slug,id]);if(duplicate.rows.length)return Response.json({error:'A project with this slug already exists.'},{status:409});await query('UPDATE projects SET title=?,title_en=?,slug=?,excerpt=?,excerpt_en=?,content=?,content_en=?,cover_image=?,images=?,technologies=?,category=?,category_en=?,demo_url=?,github_url=?,status=?,featured=?,sort_order=?,updated_at=CURRENT_TIMESTAMP WHERE id=?',[b.title,b.title_en,slug,b.excerpt,b.excerpt_en,b.content,b.content_en,b.cover_image,json(b.images),json(b.technologies),b.category,b.category_en,b.demo_url,b.github_url,b.status,b.featured?1:0,b.sort_order,id]);invalidateProjectsCache(slug);const oldSlug=(old.rows[0] as any)?.slug;if(oldSlug&&oldSlug!==slug)invalidateProjectsCache(oldSlug);return Response.json({ok:true});}catch{return Response.json({error:'Unable to update project.'},{status:400});}}
+export async function DELETE(_:Request,{params}:{params:Promise<{id:string}>}){try{if(!await isAdmin())return Response.json({error:'Unauthorized'},{status:401});const{id}=await params,old=await query('SELECT slug FROM projects WHERE id=?',[id]);if(!old.rows.length)return Response.json({error:'Project not found.'},{status:404});await query('DELETE FROM projects WHERE id=?',[id]);invalidateProjectsCache((old.rows[0] as any)?.slug);return Response.json({ok:true});}catch{return Response.json({error:'Unable to delete project.'},{status:400});}}

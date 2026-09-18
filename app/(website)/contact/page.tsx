@@ -1,7 +1,1 @@
-import ContactClient from './ContactClient';
-import { getLocale } from '@/lib/locale-server';
-
-export default async function Page() {
-  const locale = await getLocale();
-  return <ContactClient locale={locale} />;
-}
+import ContactClient from './ContactClient';import{getLocale}from'@/lib/locale-server';import{getSettings}from'@/lib/site';export default async function Page(){const[locale,settings]=await Promise.all([getLocale(),getSettings()]);return <ContactClient locale={locale} settings={settings}/>;}
