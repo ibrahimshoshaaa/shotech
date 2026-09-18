@@ -2,7 +2,9 @@
   "name": "shotech-solutions",
   "version": "1.0.0",
   "private": true,
-  "engines": {"node": ">=24"},
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:init": "tsx scripts/init-db.ts",
-    "auth:hash": "tsx scripts/hash-password.ts"
+    "auth:hash": "tsx scripts/hash-password.ts",
+    "vercel-build": "npm run db:init && next build"
   },
   "dependencies": {
     "@libsql/client": "^0.15.7",
