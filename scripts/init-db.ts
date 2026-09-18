@@ -19,9 +19,22 @@ async function main() {
   await addColumn('projects', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
   await addColumn('messages', 'company', "TEXT NOT NULL DEFAULT ''");
   await addColumn('messages', 'subject', "TEXT NOT NULL DEFAULT ''");
+  // Migrate legacy site_sections tables explicitly. CREATE TABLE IF NOT EXISTS
+  // does not add new columns to an already-existing Turso table.
   await addColumn('site_sections', 'title_en', "TEXT NOT NULL DEFAULT ''");
   await addColumn('site_sections', 'subtitle_en', "TEXT NOT NULL DEFAULT ''");
   await addColumn('site_sections', 'body_en', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'icon', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'image', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'button_text', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'button_text_en', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'button_url', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'data', "TEXT NOT NULL DEFAULT '{}'");
+  await addColumn('site_sections', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
+  await addColumn('site_sections', 'visible', 'INTEGER NOT NULL DEFAULT 1');
+  await addColumn('site_sections', 'created_at', 'TEXT');
+  await addColumn('site_sections', 'updated_at', 'TEXT');
+  await db.execute("UPDATE site_sections SET created_at=COALESCE(created_at,CURRENT_TIMESTAMP), updated_at=COALESCE(updated_at,CURRENT_TIMESTAMP)");
 
   await db.execute("UPDATE services SET slug=lower(replace(trim(title),' ','-')) WHERE slug IS NULL OR trim(slug)=''");
   const services = await db.execute('SELECT id,slug FROM services ORDER BY id');
