@@ -14,14 +14,33 @@ async function addColumn(table: string, column: string, definition: string) {
 
 async function main() {
   const schema = await fs.readFile(path.join(process.cwd(), 'scripts', 'schema.sql'), 'utf8');
-  for (const statement of schema.split(';').map((sql) => sql.trim()).filter(Boolean)) await db.execute(statement);
+  const statements = schema.split(';').map((sql) => sql.trim()).filter(Boolean);
+
+  // Create missing tables first, then migrate legacy tables, and only then
+  // create indexes/seed rows that depend on the migrated columns.
+  for (const statement of statements) {
+    if (/^CREATE TABLE IF NOT EXISTS/i.test(statement)) await db.execute(statement);
+  }
 
   await addColumn('projects', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
   await addColumn('messages', 'company', "TEXT NOT NULL DEFAULT ''");
   await addColumn('messages', 'subject', "TEXT NOT NULL DEFAULT ''");
+  // Migrate legacy site_sections tables explicitly. CREATE TABLE IF NOT EXISTS
+  // does not add new columns to an already-existing Turso table.
   await addColumn('site_sections', 'title_en', "TEXT NOT NULL DEFAULT ''");
   await addColumn('site_sections', 'subtitle_en', "TEXT NOT NULL DEFAULT ''");
   await addColumn('site_sections', 'body_en', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'icon', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'image', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'button_text', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'button_text_en', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'button_url', "TEXT NOT NULL DEFAULT ''");
+  await addColumn('site_sections', 'data', "TEXT NOT NULL DEFAULT '{}'");
+  await addColumn('site_sections', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
+  await addColumn('site_sections', 'visible', 'INTEGER NOT NULL DEFAULT 1');
+  await addColumn('site_sections', 'created_at', 'TEXT');
+  await addColumn('site_sections', 'updated_at', 'TEXT');
+  await db.execute("UPDATE site_sections SET created_at=COALESCE(created_at,CURRENT_TIMESTAMP), updated_at=COALESCE(updated_at,CURRENT_TIMESTAMP)");
 
   await db.execute("UPDATE services SET slug=lower(replace(trim(title),' ','-')) WHERE slug IS NULL OR trim(slug)=''");
   const services = await db.execute('SELECT id,slug FROM services ORDER BY id');
@@ -50,6 +69,11 @@ async function main() {
   }
   await db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_site_sections_core_unique ON site_sections(page,type) WHERE type IN ('hero','services','about','why','process','projects','cta')");
   await db.execute("UPDATE site_sections SET title_en=CASE WHEN trim(title_en)='' THEN title ELSE title_en END, subtitle_en=CASE WHEN trim(subtitle_en)='' THEN subtitle ELSE subtitle_en END, body_en=CASE WHEN trim(body_en)='' THEN body ELSE body_en END");
+
+  for (const statement of statements) {
+    if (!/^CREATE TABLE IF NOT EXISTS/i.test(statement)) await db.execute(statement);
+  }
+
   console.log('Database initialization, migrations, and backfills completed.');
 }
 main().catch((error)=>{console.error(error);process.exitCode=1;}).finally(async()=>{await db.close();});
