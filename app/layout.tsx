@@ -10,6 +10,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const english = locale === 'en';
   return {
+    icons: {
+      icon: { url: '/shotech-mark.png?v=2', type: 'image/png' },
+      apple: '/shotech-mark.png?v=2',
+    },
     title: english
       ? settings.seoTitle_en || settings.seoTitle || 'ShoTech Solutions'
       : settings.seoTitle || 'ShoTech Solutions | حلول رقمية تبني فرقًا',
